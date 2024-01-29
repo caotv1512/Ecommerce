@@ -6,7 +6,7 @@ import config from 'ormconfig';
 
 @Module({
   imports: [TypeOrmModule.forRoot(config), ProductModule, UserModule],
-  controllers: [], 
+  controllers: [],
   providers: [],
 })
 export class AppModule {}
