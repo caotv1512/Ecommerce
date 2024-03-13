@@ -1,23 +1,30 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/shared/guard/auth.guard';
+import { UpdateUserDTO } from './dtos/update-user.dto';
+import { AuthService } from '../auth/auth.service';
 
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    ) {}
   @Get()
   findAllUsers() {
     console.log('hello');
-
     return this.userService.findAll();
+  }
+
+  @Post(':data')
+  findBy(@Body() data) {
+    return this.userService.findUserBy(data);
   }
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @ApiResponse({
     status: 201,
     description: 'The record has been successfully created.',
@@ -27,15 +34,25 @@ export class UserController {
     type: CreateUserDto,
     description: 'Json structure for user object',
   })
-  async create(@Body() createUserDto: CreateUserDto) {
-    this.userService.create(createUserDto);
+  async create(@Body() body: CreateUserDto) {
+    console.log('body', body);
+    try {
+      const user = await this.userService.create(body);
+      return user;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Something went wrong');
+    }
   }
 
-  @Post('send-mail')
-  async sendMail(@Body() sendMailDto) {
-    console.log(sendMailDto, 'sendMailDto');
-    // const { to, subject, text } = sendMailDto;
-
-    await this.userService.sendMail(sendMailDto);
+  @Put(':id')
+  async updateUser(@Param('id') id: string, @Body() userData: UpdateUserDTO) {
+    try {
+      const updatedUser = await this.userService.update(id, userData);
+      return updatedUser;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Something went wrong');
+    }
   }
 }

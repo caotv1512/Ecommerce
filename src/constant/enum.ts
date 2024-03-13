@@ -1,5 +1,5 @@
 export enum UserRole {
   ADMIN,
-  USER,
   GUEST,
+  CUSTOMER 
 }
