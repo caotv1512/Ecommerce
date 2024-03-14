@@ -8,11 +8,17 @@ const config = new DocumentBuilder()
   .addServer('http://localhost:3000/', 'Local environment')
   .addServer('https://staging.yourapi.com/', 'Staging')
   .addServer('https://production.yourapi.com/', 'Production')
-  .addBearerAuth()
-  // .addGlobalParameters({
-  //   name: 'country',
-  //   in: 'query'
-  // })
+  .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT', // Định dạng của token (thường là JWT)
+      description: 'Input your JWT token', // Mô tả
+      name: 'Authorization', // Tên của header
+      in: 'header', // Header được chứa trong request header
+    },
+    'bearer', // Loại xác thực
+  )
   .build();
 
 export default config;

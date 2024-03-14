@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MailService } from '../mail/mail.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './database/user.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +10,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private mailService: MailService,
   ) {}
   async findAll() {
     return await this.userRepository.find();
@@ -31,13 +29,6 @@ export class UserService {
   async update(id, userData: UpdateUserDTO): Promise<User> {
     await this.userRepository.update(id, userData);
     return await this.userRepository.findOne(id);
-  }
-
-  async sendMail(user) {
-    console.log(user, 'user');
-
-    const { to, subject, text } = user;
-    await this.mailService.sendEmail(to, subject, text);
   }
 
   async findOneByEmail(email: any) {

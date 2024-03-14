@@ -1,19 +1,22 @@
 import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/shared/guard/auth.guard';
+import { RoleGuard } from 'src/shared/guard/auth.guard';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { AuthService } from '../auth/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService,
     ) {}
   @Get()
+  @UseGuards(RoleGuard)
+
   findAllUsers() {
-    console.log('hello');
     return this.userService.findAll();
   }
 
@@ -24,7 +27,6 @@ export class UserController {
 
   @Post()
   @ApiConsumes('multipart/form-data')
-  // @UseGuards(AuthGuard)
   @ApiResponse({
     status: 201,
     description: 'The record has been successfully created.',
