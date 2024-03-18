@@ -3,7 +3,6 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import * as jwt from 'jsonwebtoken';
-import { log } from 'console';
 import { UserRole } from 'src/constant/enum';
 
 interface DecodedToken {

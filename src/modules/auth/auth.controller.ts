@@ -5,6 +5,8 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +17,8 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dtos/create-user.dto';
 import { LoginRequestDto } from './dtos/register-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -67,5 +71,20 @@ export class AuthController {
       console.error(error);
       throw new Error(error);
     }
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req: Request) {
+    console.log(req, 'google');
+    
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    console.log('ahihi');
+    
+    res.redirect('/');
   }
 }
