@@ -14,7 +14,7 @@ export class UserController {
   constructor(private readonly userService: UserService,
     ) {}
   @Get()
-  @UseGuards(RoleGuard)
+  // @UseGuards(RoleGuard)
 
   findAllUsers() {
     return this.userService.findAll();

@@ -7,7 +7,7 @@ const config = new DocumentBuilder()
   .setVersion('1.0')
   .addServer('http://localhost:3000/', 'Local environment')
   .addServer('https://staging.yourapi.com/', 'Staging')
-  .addServer('https://production.yourapi.com/', 'Production')
+  .addServer('https://ecommerce-1o28.onrender.com/', 'Production')
   .addBearerAuth(
     {
       type: 'http',
