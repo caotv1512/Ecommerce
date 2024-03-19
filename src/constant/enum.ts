@@ -3,3 +3,9 @@ export enum UserRole {
   GUEST,
   CUSTOMER 
 }
+
+export enum UserGender{
+  MALE,
+  FEMALE,
+  OTHER
+}
