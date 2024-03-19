@@ -18,6 +18,7 @@ import { CouponModule } from './modules/coupon/coupon.module';
 import { MessageModule } from './modules/message/message.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AddressModule } from './modules/address/address.module';
+import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AddressModule } from './modules/address/address.module';
     MessageModule,
     NotificationModule,
     AddressModule,
+    ReviewModule,
   ],
   controllers: [],
   providers: [],
