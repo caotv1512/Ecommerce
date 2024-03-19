@@ -4,6 +4,7 @@ import { User } from './database/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDTO } from './dtos/update-user.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UserGender } from 'src/constant/enum';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,14 @@ export class UserService {
     return user
   }
   async create(userData: CreateUserDto): Promise<User> {
+    const gender = userData.gender
+    if (gender === UserGender.MALE) {
+      userData.avatar = 'http://surl.li/rrtgf';
+    } else if (gender === UserGender.FEMALE) {
+      userData.avatar = 'http://surl.li/rrtpe';
+    } else {
+      userData.avatar = 'http://surl.li/rrtgf';
+    }
     const user = this.userRepository.create(userData);
     return await this.userRepository.save(user);
   }
