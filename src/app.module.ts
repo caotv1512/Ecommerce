@@ -11,6 +11,13 @@ import { CategoryModule } from './modules/category/category.module';
 import { ProductSizeModule } from './modules/product-size/product-size.module';
 import { OrderModule } from './modules/order/order.module';
 import { OrderDetailModule } from './modules/order-detail/order-detail.module';
+import { ShippingMethodModule } from './modules/shipping-method/shipping-method.module';
+import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
+import { CouponModule } from './modules/coupon/coupon.module';
+import { MessageModule } from './modules/message/message.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { AddressModule } from './modules/address/address.module';
 
 @Module({
   imports: [
@@ -27,6 +34,13 @@ import { OrderDetailModule } from './modules/order-detail/order-detail.module';
     ProductSizeModule,
     OrderModule,
     OrderDetailModule,
+    ShippingMethodModule,
+    PaymentMethodModule,
+    WishlistModule,
+    CouponModule,
+    MessageModule,
+    NotificationModule,
+    AddressModule,
   ],
   controllers: [],
   providers: [],
