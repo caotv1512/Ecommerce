@@ -1,5 +1,15 @@
 // src/products/dto/create-product.dto.ts
-import { IsNotEmpty, IsString, IsNumber, IsPositive, IsOptional, IsArray, ArrayNotEmpty, ArrayMinSize, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsPositive,
+  IsOptional,
+  IsArray,
+  ArrayNotEmpty,
+  ArrayMinSize,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {
@@ -12,29 +22,24 @@ export class CreateProductDto {
   description?: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  price: number;
+  price:   string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  quantity: number;
+  quantity: number | string;
 
   @IsOptional()
   @IsString()
   imageUrl?: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  categoryId: number;
+  categoryId: number | string;
 
-  @IsArray()
-  @ArrayNotEmpty()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => CreateProductSizeDto)
-  sizes: CreateProductSizeDto[];
+  // @IsArray()
+  // @ArrayNotEmpty()
+  // @ArrayMinSize(1)
+  // @ValidateNested({ each: true })
+  // @Type(() => CreateProductSizeDto)
+  sizes: CreateProductSizeDto[] ;
 }
 
 export class CreateProductSizeDto {
@@ -44,6 +49,5 @@ export class CreateProductSizeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  @IsPositive()
   price: number;
 }

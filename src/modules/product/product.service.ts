@@ -8,8 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './database/product.entity';
 import { Category } from '../category/database/category.entity';
-import { CreateProductDto, CreateProductSizeDto } from './dtos/create-product.dto';
-import { UpdateProductDto, UpdateProductSizeDto } from './dtos/update-product.dto';
+import {
+  CreateProductDto,
+  CreateProductSizeDto,
+} from './dtos/create-product.dto';
+import {
+  UpdateProductDto,
+  UpdateProductSizeDto,
+} from './dtos/update-product.dto';
 import { ProductSize } from '../product-size/database/product-size.entity';
 
 @Injectable()
@@ -19,39 +25,82 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(ProductSize)
+    private readonly productSizeRepository: Repository<ProductSize>,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const { name, description, price, quantity, imageUrl, categoryId, sizes } = createProductDto;
+  async validateProduct(product: CreateProductDto) {
+    const productDup = await this.productRepository.findOne({
+      where: { name: product.name },
+    });
+    return productDup;
+  }
 
-    // Kiểm tra sự tồn tại của category
-    const category = await this.categoryRepository.findOne({where: {id: categoryId}});
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { name, description, price, quantity, imageUrl, categoryId, sizes } =
+      createProductDto;
+    const productDup = await this.validateProduct(createProductDto);
+    if (productDup) {
+      throw new BadRequestException(
+        `Product with name ${createProductDto.name} already exists`,
+      );
+    }
+
+    // Kiểm tra sự tồn tại của category+
+    const category = await this.categoryRepository.findOne({
+      where: { id: +categoryId },
+    });
     if (!category) {
       throw new NotFoundException(`Category with ID ${categoryId} not found`);
     }
 
+    const newProduct = {
+      name: name,
+      description: description,
+      price: +price,
+      quantity: +quantity,
+      imageUrl: imageUrl,
+      category: category,
+    };
+    console.log(newProduct, '============');
+
     // Tạo sản phẩm
-    const product = this.productRepository.create({
-      name,
-      description,
-      price,
-      quantity,
-      imageUrl,
-      category,
-    });
+    const product = this.productRepository.create(newProduct);
+    console.log(product, '====================================');
 
     // Tạo kích thước cho sản phẩm
-    if (sizes && sizes.length > 0) {
-      product.sizes = sizes.map((sizeDto: CreateProductSizeDto) => {
-        const { name, price } = sizeDto;
-        const size = new ProductSize();
-        size.name = name;
-        size.price = price;
-        return size;
-      });
+    function convertArray(input): CreateProductSizeDto[] {
+      const output: CreateProductSizeDto[] = [];
+      for (const jsonString of input) {
+        try {
+          const item: CreateProductSizeDto = JSON.parse(jsonString);
+          output.push(item);
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      }
+      return output;
+    }
+    const sizeList = convertArray(sizes);
+    const savedProduct= await this.productRepository.save(product);
+
+    if (sizeList && sizeList.length > 0) {
+      const productSizes = await Promise.all(
+        sizeList.map(async (sizeDto: CreateProductSizeDto) => {
+          const { name, price } = sizeDto;
+          const productSize = this.productSizeRepository.create({
+            name,
+            price: +price,
+            product, // Gán sản phẩm cho kích thước
+          });
+
+          return await this.productSizeRepository.save(productSize);
+        }),
+      );
+      savedProduct.sizes = productSizes; 
     }
 
-    return await this.productRepository.save(product);
+    return savedProduct
   }
 
   async findAll(): Promise<Product[]> {
@@ -69,11 +118,15 @@ export class ProductService {
     return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     const product = await this.findOne(id);
 
     // Cập nhật các trường thông tin cơ bản của sản phẩm
-    const { name, description, price, quantity, imageUrl, categoryId, sizes } = updateProductDto;
+    const { name, description, price, quantity, imageUrl, categoryId, sizes } =
+      updateProductDto;
     if (name) product.name = name;
     if (description) product.description = description;
     if (price) product.price = price;
