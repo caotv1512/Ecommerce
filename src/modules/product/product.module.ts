@@ -5,9 +5,10 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './database/product.entity';
 import { Category } from '../category/database/category.entity';
+import { ProductSize } from '../product-size/database/product-size.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Category])],
+  imports: [TypeOrmModule.forFeature([Product, Category, ProductSize])],
   controllers: [ProductController],
   providers: [ProductService, CloudinaryService],
 })

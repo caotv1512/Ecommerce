@@ -17,6 +17,7 @@ import { Product } from './database/product.entity';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { CreateProductRequest } from './interfaces/creaet-request.interface';
 
 @Controller('product')
 export class ProductController {
@@ -45,6 +46,8 @@ export class ProductController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    console.log(file, 'fileeeeeeeeeeeeeeeeeeeee');
+    
     const fileUpload = await this.cloudinaryService.uploadFile(file);
     console.log(fileUpload, 'file');
     return;
@@ -57,12 +60,12 @@ export class ProductController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto,
   ): Promise<any> {
-      
-    console.log('============', file);
+
+    const fileUpload = await this.cloudinaryService.uploadFile(file);
+    console.log('============', fileUpload.url);
     
-    // const fileUpload = await this.cloudinaryService.uploadFile(file);
-    // createProductDto.imageUrl = fileUpload?.path;
-    // return this.productsService.create(createProductDto);
+    createProductDto.imageUrl = fileUpload?.url;
+    return this.productsService.create(createProductDto);
   }
 
   @Get()

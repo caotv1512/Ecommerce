@@ -13,7 +13,7 @@ export class ContactController {
         ...formData,
         from: 'abc@gmail.com',
         subject: 'Khách hàng mới:',
-        toList: ['caomanhct@gmail.com', 'luannv@rikkeiacademy.com'],
+        toList: ['caomanhct@gmail.com', 'hailongtam98@gmail.com'],
       };
       // Gửi email và chờ cho đến khi hoàn thành
       await this.emailService.sendEmail(emailData);
