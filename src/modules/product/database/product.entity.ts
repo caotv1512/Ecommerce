@@ -1,8 +1,9 @@
 // src/products/product.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Category } from '../../category/database/category.entity';
 import { ProductSize } from '../../product-size/database/product-size.entity';
 import { OrderDetail } from '../../order-detail/database/order-detail.entity';
+import { Image } from 'src/modules/image/database/image.entity';
 
 @Entity()
 export class Product {
@@ -21,8 +22,11 @@ export class Product {
   @Column({ type: 'int' })
   quantity: number;
 
-  @Column({ name: 'image_url', length: 255, nullable: true })
-  imageUrl: string;
+  // Mối quan hệ một-nhiều với bảng Image
+  @OneToMany(() => Image, image => image.product)
+  @JoinColumn()
+  images: Image[];
+
 
   @OneToMany(() => OrderDetail, orderDetail => orderDetail.product) // Đây là mối quan hệ đúng
   orderDetails: OrderDetail[]; // Đảm bảo bạn đã import OrderDetail từ '../orders/order-detail.entity'

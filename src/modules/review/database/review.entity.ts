@@ -1,4 +1,5 @@
 // src/reviews/review.entity.ts
+import { Rating } from 'src/constant/enum';
 import { Product } from 'src/modules/product/database/product.entity';
 import { User } from 'src/modules/user/database/user.entity';
 import {
@@ -27,8 +28,11 @@ export class Review {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'int' })
-  rating: number;
+  @Column({
+    type: 'enum',
+    enum: Rating, // Sử dụng enum Rating cho trường rating
+  })
+  rating: Rating;
 
   @Column({ name: 'review_date', type: 'date' })
   reviewDate: Date;
