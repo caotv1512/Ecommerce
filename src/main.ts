@@ -6,6 +6,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import config from './config/swagger-config';
 import * as basicAuth from "express-basic-auth";
 
+// Import firebase
+import * as admin from 'firebase-admin';
+import { ConfigService } from '@nestjs/config';
+import { ServiceAccount } from 'firebase-admin';
+
 async function bootstrap() {
   const PORT = process.env.PORT || 8080;
   const app = await NestFactory.create(AppModule);
@@ -24,7 +29,22 @@ async function bootstrap() {
     })
   );
 
+  // Kêt nối firebase
+
+// const configService: ConfigService = app.get(ConfigService);
+//   // Set the config options
+//   const adminConfig: ServiceAccount = {
+//     "projectId": process.env.FIREBASE_PROJECT_ID,
+//     "privateKey": process.env.FIREBASE_PRIVATE_KEY,
+//     "clientEmail":process.env.FIREBASE_CLIENT_EMAIL,
+//   };
+//   // Initialize the firebase admin app
+//   admin.initializeApp({
+//     credential: admin.credential.cert(adminConfig),
+//     databaseURL: "https://nestjs-fierebase-default-rtdb.firebaseio.com/",
+//   }); 
   // Sử dụng middleware express-formidable
+  
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 

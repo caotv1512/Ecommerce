@@ -9,6 +9,7 @@ import {
   ArrayNotEmpty,
   ArrayMinSize,
   ValidateNested,
+  IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -28,17 +29,19 @@ export class CreateProductDto {
   quantity: number | string;
 
   @IsOptional()
-  @IsString()
+  @IsArray()
+  @Type(() => CreateImageDto)
+  images: CreateImageDto[];
   imageUrl?: string;
 
   @IsNotEmpty()
   categoryId: number | string;
 
-  // @IsArray()
-  // @ArrayNotEmpty()
-  // @ArrayMinSize(1)
-  // @ValidateNested({ each: true })
-  // @Type(() => CreateProductSizeDto)
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductSizeDto)
   sizes: CreateProductSizeDto[] ;
 }
 
@@ -50,4 +53,10 @@ export class CreateProductSizeDto {
   @IsNotEmpty()
   @IsNumber()
   price: number;
+}
+
+class CreateImageDto {
+  @IsUrl()
+  @IsNotEmpty()
+  url: string;
 }

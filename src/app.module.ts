@@ -19,6 +19,8 @@ import { MessageModule } from './modules/message/message.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AddressModule } from './modules/address/address.module';
 import { ReviewModule } from './modules/review/review.module';
+import { ImageService } from './modules/image/image.service';
+import { ImageModule } from './modules/image/image.module';
 
 @Module({
   imports: [
@@ -43,8 +45,9 @@ import { ReviewModule } from './modules/review/review.module';
     NotificationModule,
     AddressModule,
     ReviewModule,
+    ImageModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [ImageService],
 })
 export class AppModule {}

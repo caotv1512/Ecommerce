@@ -29,17 +29,12 @@ export class ProductService {
     private readonly productSizeRepository: Repository<ProductSize>,
   ) {}
 
-  async validateProduct(product: CreateProductDto) {
-    const productDup = await this.productRepository.findOne({
-      where: { name: product.name },
-    });
-    return productDup;
-  }
-
   async create(createProductDto: CreateProductDto): Promise<Product> {
     const { name, description, price, quantity, imageUrl, categoryId, sizes } =
       createProductDto;
-    const productDup = await this.validateProduct(createProductDto);
+    const productDup = await this.productRepository.findOne({
+      where: { name },
+    });
     if (productDup) {
       throw new BadRequestException(
         `Product with name ${createProductDto.name} already exists`,
@@ -62,11 +57,9 @@ export class ProductService {
       imageUrl: imageUrl,
       category: category,
     };
-    console.log(newProduct, '============');
 
     // Tạo sản phẩm
     const product = this.productRepository.create(newProduct);
-    console.log(product, '====================================');
 
     // Tạo kích thước cho sản phẩm
     function convertArray(input): CreateProductSizeDto[] {
@@ -82,7 +75,7 @@ export class ProductService {
       return output;
     }
     const sizeList = convertArray(sizes);
-    const savedProduct= await this.productRepository.save(product);
+    const savedProduct = await this.productRepository.save(product);
 
     if (sizeList && sizeList.length > 0) {
       const productSizes = await Promise.all(
@@ -97,14 +90,16 @@ export class ProductService {
           return await this.productSizeRepository.save(productSize);
         }),
       );
-      savedProduct.sizes = productSizes; 
+      savedProduct.sizes = productSizes;
     }
 
-    return savedProduct
+    return savedProduct;
   }
 
   async findAll(): Promise<Product[]> {
-    return await this.productRepository.find();
+    return await this.productRepository.find({
+      relations: ['category', 'sizes', 'images'],
+    });
   }
 
   async findOne(id: number): Promise<Product> {
@@ -122,18 +117,29 @@ export class ProductService {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const product = await this.findOne(id);
-
-    // Cập nhật các trường thông tin cơ bản của sản phẩm
-    const { name, description, price, quantity, imageUrl, categoryId, sizes } =
+    const { name, description, price, quantity, images, categoryId, sizes } =
       updateProductDto;
-    if (name) product.name = name;
-    if (description) product.description = description;
-    if (price) product.price = price;
-    if (quantity) product.quantity = quantity;
-    if (imageUrl) product.imageUrl = imageUrl;
 
-    // Kiểm tra sự tồn tại của category nếu có
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    if (name) {
+      product.name = name;
+    }
+    if (description) {
+      product.description = description;
+    }
+    if (price) {
+      product.price = price;
+    }
+    if (quantity) {
+      product.quantity = quantity;
+    }
+    if (images) {
+      product.images = [];
+    }
     if (categoryId) {
       const category = await this.categoryRepository.findOne({
         where: { id: categoryId },
@@ -144,22 +150,37 @@ export class ProductService {
       product.category = category;
     }
 
-    // Cập nhật kích thước của sản phẩm
     if (sizes && sizes.length > 0) {
-      product.sizes = sizes.map((sizeDto: UpdateProductSizeDto) => {
-        const { name, price } = sizeDto;
-        const size = new ProductSize();
-        size.name = name;
-        size.price = price;
-        return size;
-      });
+      const productSizes = await Promise.all(
+        sizes.map(async (sizeDto) => {
+          const { name, price } = sizeDto;
+          let productSize = await this.productSizeRepository.findOne({
+            where: { product, name },
+          });
+          if (!productSize) {
+            productSize = new ProductSize();
+            productSize.name = name;
+            productSize.price = price;
+            productSize.product = product;
+            await this.productSizeRepository.save(productSize);
+          } else {
+            productSize.price = price;
+            await this.productSizeRepository.save(productSize);
+          }
+          return productSize;
+        }),
+      );
+      product.sizes = productSizes;
     }
 
-    return await this.productRepository.save(product);
+    return this.productRepository.save(product);
   }
 
   async remove(id: number): Promise<void> {
-    const product = await this.findOne(id);
+    const product = await this.productRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
     await this.productRepository.remove(product);
   }
 }

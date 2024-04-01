@@ -1,33 +1,39 @@
-// src/products/dto/update-product.dto.ts
-import { IsString, IsNumber, IsPositive, IsOptional, IsArray, ArrayNotEmpty, ArrayMinSize, ValidateNested } from 'class-validator';
+// update-product.dto.ts
+import { IsNotEmpty, IsOptional, IsNumber, IsString, IsArray, ArrayNotEmpty, ArrayMinSize, ValidateNested, IsUrl } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
-  name?: string;
+  @IsNotEmpty()
+  name: string;
 
   @IsOptional()
   @IsString()
-  description?: string;
+  @IsNotEmpty()
+  description: string;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
-  price?: number;
+  @IsNotEmpty()
+  price: number;
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
-  quantity?: number;
+  @IsNotEmpty()
+  quantity: number;
 
   @IsOptional()
-  @IsString()
-  imageUrl?: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateImageDto)
+  images?: UpdateImageDto[];
 
   @IsOptional()
   @IsNumber()
-  categoryId?: number;
+  @IsNotEmpty()
+  categoryId: number;
 
   @IsOptional()
   @IsArray()
@@ -35,16 +41,21 @@ export class UpdateProductDto {
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => UpdateProductSizeDto)
-  sizes?: UpdateProductSizeDto[];
+  sizes: UpdateProductSizeDto[];
 }
 
 export class UpdateProductSizeDto {
-  @IsOptional()
   @IsString()
-  name?: string;
+  @IsNotEmpty()
+  name: string;
 
-  @IsOptional()
   @IsNumber()
-  @IsPositive()
-  price?: number;
+  @IsNotEmpty()
+  price: number;
+}
+
+class UpdateImageDto {
+  @IsUrl()
+  @IsNotEmpty()
+  url: string;
 }

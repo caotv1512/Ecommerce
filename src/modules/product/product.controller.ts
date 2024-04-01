@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -62,8 +65,6 @@ export class ProductController {
   ): Promise<any> {
 
     const fileUpload = await this.cloudinaryService.uploadFile(file);
-    console.log('============', fileUpload.url);
-    
     createProductDto.imageUrl = fileUpload?.url;
     return this.productsService.create(createProductDto);
   }
@@ -78,14 +79,21 @@ export class ProductController {
     return this.productsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    return this.productsService.update(+id, updateProductDto);
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
+    try {
+      const updatedProduct = await this.productsService.update(id, updateProductDto);
+      return updatedProduct;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message);
+      } else {
+        throw error;
+      }
+    }
   }
-
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
     return this.productsService.remove(+id);
