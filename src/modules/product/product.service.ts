@@ -97,7 +97,9 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    return await this.productRepository.find();
+    return await this.productRepository.find({
+      relations: ['category', 'sizes', 'images'],
+    });
   }
 
   async findOne(id: number): Promise<Product> {
@@ -173,7 +175,7 @@ export class ProductService {
 
     return this.productRepository.save(product);
   }
-  
+
   async remove(id: number): Promise<void> {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
