@@ -15,13 +15,14 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from '../user/user.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Product } from './database/product.entity';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { CreateProductRequest } from './interfaces/creaet-request.interface';
 
+@ApiTags('Product')
 @Controller('product')
 export class ProductController {
   constructor(
