@@ -37,7 +37,7 @@ export class ProductService {
     });
     if (productDup) {
       throw new BadRequestException(
-        `Product with name ${createProductDto.name} already exists`,
+        `Product with name ${productDup.name} already exists`,
       );
     }
 

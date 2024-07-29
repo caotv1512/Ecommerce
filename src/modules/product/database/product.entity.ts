@@ -22,16 +22,14 @@ export class Product {
   @Column({ type: 'int' })
   quantity: number;
 
-  // Mối quan hệ một-nhiều với bảng Image
   @OneToMany(() => Image, image => image.product)
   @JoinColumn()
   images: Image[];
 
 
-  @OneToMany(() => OrderDetail, orderDetail => orderDetail.product) // Đây là mối quan hệ đúng
-  orderDetails: OrderDetail[]; // Đảm bảo bạn đã import OrderDetail từ '../orders/order-detail.entity'
-
-
+  @OneToMany(() => OrderDetail, orderDetail => orderDetail.product) 
+  orderDetails: OrderDetail[]; 
+  
   @ManyToOne(() => Category, category => category.products)
   category: Category;
 

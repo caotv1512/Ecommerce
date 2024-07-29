@@ -21,6 +21,7 @@ import { AddressModule } from './modules/address/address.module';
 import { ReviewModule } from './modules/review/review.module';
 import { ImageService } from './modules/image/image.service';
 import { ImageModule } from './modules/image/image.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ImageModule } from './modules/image/image.module';
     AddressModule,
     ReviewModule,
     ImageModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [],
   providers: [ImageService],
