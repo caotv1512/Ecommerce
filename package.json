@@ -22,6 +22,7 @@
         "lint-staged": "eslint 'src/**/*.ts'"
     },
     "dependencies": {
+        "@google-cloud/pubsub": "^4.3.3",
         "@nestjs-modules/mailer": "^1.10.3",
         "@nestjs/common": "^10.0.0",
         "@nestjs/config": "^3.1.1",
@@ -41,9 +42,11 @@
         "ejs": "^3.1.9",
         "express-basic-auth": "^1.2.1",
         "express-formidable": "^1.2.0",
+        "firebase-admin": "^12.0.0",
         "handlebars": "^4.7.8",
         "multer": "^1.4.5-lts.1",
         "mysql2": "^3.7.1",
+        "nestjs-google-pubsub-microservice": "^10.1.0",
         "nodemailer": "^6.9.12",
         "passport": "^0.7.0",
         "passport-google-oauth20": "^2.0.0",
