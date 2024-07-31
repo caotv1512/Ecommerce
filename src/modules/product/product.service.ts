@@ -10,11 +10,9 @@ import { Product } from './database/product.entity';
 import { Category } from '../category/database/category.entity';
 import {
   CreateProductDto,
-  CreateProductSizeDto,
 } from './dtos/create-product.dto';
 import {
-  UpdateProductDto,
-  UpdateProductSizeDto,
+  UpdateProductDto
 } from './dtos/update-product.dto';
 import { ProductSize } from '../product-size/database/product-size.entity';
 
@@ -30,7 +28,7 @@ export class ProductService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    const { name, description, price, quantity, imageUrl, categoryId, sizes } =
+    const { name, description, price, quantity, imageUrl, categoryId } =
       createProductDto;
     const productDup = await this.productRepository.findOne({
       where: { name },
@@ -41,7 +39,6 @@ export class ProductService {
       );
     }
 
-    // Kiểm tra sự tồn tại của category+
     const category = await this.categoryRepository.findOne({
       where: { id: +categoryId },
     });
@@ -58,40 +55,8 @@ export class ProductService {
       category: category,
     };
 
-    // Tạo sản phẩm
     const product = this.productRepository.create(newProduct);
-
-    // Tạo kích thước cho sản phẩm
-    function convertArray(input): CreateProductSizeDto[] {
-      const output: CreateProductSizeDto[] = [];
-      for (const jsonString of input) {
-        try {
-          const item: CreateProductSizeDto = JSON.parse(jsonString);
-          output.push(item);
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
-      }
-      return output;
-    }
-    const sizeList = convertArray(sizes);
     const savedProduct = await this.productRepository.save(product);
-
-    if (sizeList && sizeList.length > 0) {
-      const productSizes = await Promise.all(
-        sizeList.map(async (sizeDto: CreateProductSizeDto) => {
-          const { name, price } = sizeDto;
-          const productSize = this.productSizeRepository.create({
-            name,
-            price: +price,
-            product, // Gán sản phẩm cho kích thước
-          });
-
-          return await this.productSizeRepository.save(productSize);
-        }),
-      );
-      savedProduct.sizes = productSizes;
-    }
 
     return savedProduct;
   }
@@ -117,7 +82,7 @@ export class ProductService {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const { name, description, price, quantity, images, categoryId, sizes } =
+    const { name, description, price, quantity, images, categoryId } =
       updateProductDto;
 
     const product = await this.productRepository.findOne({ where: { id } });
@@ -148,29 +113,6 @@ export class ProductService {
         throw new NotFoundException(`Category with ID ${categoryId} not found`);
       }
       product.category = category;
-    }
-
-    if (sizes && sizes.length > 0) {
-      const productSizes = await Promise.all(
-        sizes.map(async (sizeDto) => {
-          const { name, price } = sizeDto;
-          let productSize = await this.productSizeRepository.findOne({
-            where: { product, name },
-          });
-          if (!productSize) {
-            productSize = new ProductSize();
-            productSize.name = name;
-            productSize.price = price;
-            productSize.product = product;
-            await this.productSizeRepository.save(productSize);
-          } else {
-            productSize.price = price;
-            await this.productSizeRepository.save(productSize);
-          }
-          return productSize;
-        }),
-      );
-      product.sizes = productSizes;
     }
 
     return this.productRepository.save(product);

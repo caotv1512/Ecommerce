@@ -34,25 +34,8 @@ export class UpdateProductDto {
   @IsNumber()
   @IsNotEmpty()
   categoryId: number;
-
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => UpdateProductSizeDto)
-  sizes: UpdateProductSizeDto[];
 }
 
-export class UpdateProductSizeDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
-}
 
 class UpdateImageDto {
   @IsUrl()

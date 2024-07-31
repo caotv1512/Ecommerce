@@ -5,7 +5,7 @@ const config = new DocumentBuilder()
   .setTitle('E-Commerce API')
   .setDescription('The API E-Commerce for user and admin')
   .setVersion('1.0')
-  .addServer('http://localhost:3000/', 'Local environment')
+  .addServer('http://localhost:3001/', 'Local environment')
   .addServer('https://staging.yourapi.com/', 'Staging')
   .addServer('https://ecommerce-1o28.onrender.com/', 'Production')
   .addBearerAuth(

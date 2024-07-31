@@ -9,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../user/dtos/create-user.dto';
 import { SecureUtils } from 'src/shared/utils';
-import { log } from 'console';
 
 @Injectable()
 export class AuthService {

@@ -27,7 +27,7 @@ import { GoogleController } from './google.controller';
     PassportModule.register({ defaultStrategy: 'google' }),
   ],
   controllers: [AuthController, GoogleController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy], // JwtService đã được tự động cung cấp bởi JwtModule
+  providers: [AuthService],
   exports: [AuthService, PassportModule],
 })
 export class AuthModule {}
