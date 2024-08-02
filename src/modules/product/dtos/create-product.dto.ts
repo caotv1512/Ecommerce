@@ -31,7 +31,7 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  quantity: number ;
+  stock: number ;
 
   @ApiProperty()
   @IsOptional()

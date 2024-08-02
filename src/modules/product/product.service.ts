@@ -28,7 +28,7 @@ export class ProductService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    const { name, description, price, quantity, imageUrl, categoryId } =
+    const { name, description, price, stock, imageUrl, categoryId } =
       createProductDto;
     const productDup = await this.productRepository.findOne({
       where: { name },
@@ -50,7 +50,7 @@ export class ProductService {
       name: name,
       description: description,
       price: +price,
-      quantity: +quantity,
+      stock: +stock,
       imageUrl: imageUrl,
       category: category,
     };
@@ -82,7 +82,7 @@ export class ProductService {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const { name, description, price, quantity, images, categoryId } =
+    const { name, description, price, stock, images, categoryId } =
       updateProductDto;
 
     const product = await this.productRepository.findOne({ where: { id } });
@@ -99,8 +99,8 @@ export class ProductService {
     if (price) {
       product.price = price;
     }
-    if (quantity) {
-      product.quantity = quantity;
+    if (stock) {
+      product.stock = stock;
     }
     if (images) {
       product.images = [];
