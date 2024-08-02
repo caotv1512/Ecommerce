@@ -21,7 +21,7 @@ export class UpdateProductDto {
   @IsOptional()
   @IsNumber()
   @IsNotEmpty()
-  quantity: number;
+  stock: number;
 
   @IsOptional()
   @IsArray()
