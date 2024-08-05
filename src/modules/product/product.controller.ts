@@ -50,10 +50,7 @@ export class ProductController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    console.log(file, 'fileeeeeeeeeeeeeeeeeeeee');
-    
     const fileUpload = await this.cloudinaryService.uploadFile(file);
-    console.log(fileUpload, 'file');
     return;
   }
 
@@ -71,7 +68,7 @@ export class ProductController {
   }
 
   @Get()
-  findAll(): Promise<Product[]> {
+  findAll(){
     return this.productsService.findAll();
   }
 
