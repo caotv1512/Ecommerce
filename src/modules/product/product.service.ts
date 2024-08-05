@@ -8,12 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './database/product.entity';
 import { Category } from '../category/database/category.entity';
-import {
-  CreateProductDto,
-} from './dtos/create-product.dto';
-import {
-  UpdateProductDto
-} from './dtos/update-product.dto';
+import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductSize } from '../product-size/database/product-size.entity';
 
 @Injectable()
@@ -61,9 +57,15 @@ export class ProductService {
     return savedProduct;
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productRepository.find({
-      relations: ['category', 'sizes', 'images'],
+  async findAll(){
+    const products = await this.productRepository.find({
+      relations: ['category', 'images'],
+    });
+    return products.map((product) => {
+      return {
+        ...product,
+        category: product?.category?.name,
+      };
     });
   }
 
