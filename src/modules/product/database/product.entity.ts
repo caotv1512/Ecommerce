@@ -33,10 +33,6 @@ export class Product {
   @ManyToOne(() => Category, category => category.products)
   category: Category;
 
-  // @OneToMany(() => ProductSize, productSize => productSize.product)
-  // sizes: ProductSize[];
-
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

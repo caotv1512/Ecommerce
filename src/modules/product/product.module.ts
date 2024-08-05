@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './database/product.entity';
 import { Category } from '../category/database/category.entity';
 import { ProductSize } from '../product-size/database/product-size.entity';
+import { UploadService } from '../upload/upload.service';
+import { Image } from '../image/database/image.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Category, ProductSize])],
+  imports: [TypeOrmModule.forFeature([Product, Category, Image])],
   controllers: [ProductController],
-  providers: [ProductService, CloudinaryService],
+  providers: [ProductService, CloudinaryService, UploadService],
 })
 export class ProductModule {}

@@ -11,6 +11,8 @@ import { Category } from '../category/database/category.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductSize } from '../product-size/database/product-size.entity';
+import { UploadService } from '../upload/upload.service';
+import { Image } from '../image/database/image.entity';
 
 @Injectable()
 export class ProductService {
@@ -19,40 +21,53 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-    @InjectRepository(ProductSize)
-    private readonly productSizeRepository: Repository<ProductSize>,
+    private readonly uploadService: UploadService,
+    @InjectRepository(Image)
+    private readonly imageRepository: Repository<Image>,
   ) {}
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
-    const { name, description, price, stock, imageUrl, categoryId } =
-      createProductDto;
-    const productDup = await this.productRepository.findOne({
-      where: { name },
-    });
-    if (productDup) {
-      throw new BadRequestException(
-        `Product with name ${productDup.name} already exists`,
-      );
-    }
+  async uploadImages(fileUploadPromises: Array<{ fileName: string, file: Buffer }>): Promise<string[]> {
+    return this.uploadService.uploadMultiple(fileUploadPromises);
+  }
 
-    const category = await this.categoryRepository.findOne({
-      where: { id: +categoryId },
-    });
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    }
+  async create(createProductDto: CreateProductDto, imageUrls: string[]): Promise<Product> {
+    const { name, description, price, stock, categoryId } =
+        createProductDto;
+      const productDup = await this.productRepository.findOne({
+        where: { name },
+      });
+      if (productDup) {
+        throw new BadRequestException(
+          `Product with name ${productDup.name} already exists`,
+        );
+      }
+  
+      const category = await this.categoryRepository.findOne({
+        where: { id: +categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException(`Category with ID ${categoryId} not found`);
+      }
+    // Tạo đối tượng Product từ DTO
+    const product = new Product();
+    product.name = createProductDto.name;
+    product.description = createProductDto.description;
+    product.price = createProductDto.price;
+    product.stock = createProductDto.stock;
+    product.category = category;
 
-    const newProduct = {
-      name: name,
-      description: description,
-      price: +price,
-      stock: +stock,
-      imageUrl: imageUrl,
-      category: category,
-    };
-
-    const product = this.productRepository.create(newProduct);
+    // Lưu sản phẩm vào cơ sở dữ liệu
     const savedProduct = await this.productRepository.save(product);
+
+    // Tạo các đối tượng Image và lưu vào cơ sở dữ liệu
+    const images = imageUrls.map(url => {
+      const image = new Image();
+      image.url = url;
+      image.product = savedProduct;
+      return image;
+    });
+
+    await this.imageRepository.save(images);
 
     return savedProduct;
   }
@@ -61,7 +76,7 @@ export class ProductService {
     const products = await this.productRepository.find({
       relations: ['category', 'images'],
     });
-    return products.map((product) => {
+    return products.reverse().map((product) => {
       return {
         ...product,
         category: product?.category?.name,

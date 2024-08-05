@@ -22,6 +22,8 @@ import { ReviewModule } from './modules/review/review.module';
 import { ImageService } from './modules/image/image.service';
 import { ImageModule } from './modules/image/image.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FilesModule } from './modules/upload/upload.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -47,7 +49,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     AddressModule,
     ReviewModule,
     ImageModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    FilesModule,
   ],
   controllers: [],
   providers: [ImageService],
