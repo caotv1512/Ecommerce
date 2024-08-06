@@ -10,7 +10,6 @@ export class Image {
   @Column()
   url: string;
 
-  // Mối quan hệ nhiều-một với bảng Product
   @ManyToOne(() => Product, product => product.images)
   @JoinColumn({ name: 'product_id' })
   product: Product;

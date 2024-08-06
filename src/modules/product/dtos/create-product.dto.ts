@@ -34,36 +34,10 @@ export class CreateProductDto {
   stock: number ;
 
   @ApiProperty()
-  @IsOptional()
-  @IsArray()
-  @Type(() => CreateImageDto)
-  images: CreateImageDto[];
-  imageUrl?: string;
-
-  @ApiProperty()
   @IsNotEmpty()
   categoryId: number;
-
-  // @ApiProperty()
-  // @IsArray()
-  // @ArrayNotEmpty()
-  // @ArrayMinSize(1)
-  // @ValidateNested({ each: true })
-  // @Type(() => CreateProductSizeDto)
-  // sizes: CreateProductSizeDto[];
 }
 
-// export class CreateProductSizeDto {
-//   @ApiProperty()
-//   @IsNotEmpty()
-//   @IsString()
-//   name: string;
-
-//   @ApiProperty()
-//   @IsNotEmpty()
-//   @IsNumber()
-//   price: number;
-// }
 
 class CreateImageDto {
   @IsUrl()

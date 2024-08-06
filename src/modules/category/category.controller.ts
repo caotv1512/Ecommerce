@@ -1,20 +1,45 @@
 // src/categories/categories.controller.ts
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  UploadedFiles,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Category } from './database/category.entity';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
 import { ApiTags } from '@nestjs/swagger';
-
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadService } from '../upload/upload.service';
 
 @ApiTags('Category')
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this.categoryService.create(createCategoryDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFile(new ParseFilePipe()) image: Express.Multer.File,
+  ): Promise<Category> {
+    const imageUrls = await this.uploadService.upload(
+      image.originalname,
+      image.buffer,
+    );
+    
+    return this.categoryService.create(createCategoryDto, imageUrls);
   }
 
   @Get()
@@ -28,7 +53,10 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto): Promise<Category> {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
     return this.categoryService.update(+id, updateCategoryDto);
   }
 

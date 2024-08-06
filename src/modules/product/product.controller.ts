@@ -10,9 +10,10 @@ import {
   Post,
   Put,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { UserService } from '../user/user.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -55,16 +56,34 @@ export class ProductController {
   }
 
 
-  @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  async create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createProductDto: CreateProductDto,
-  ): Promise<any> {
+  // @Post()
+  // @UseInterceptors(FileInterceptor('file'))
+  // async create(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Body() createProductDto: CreateProductDto,
+  // ): Promise<any> {
 
-    const fileUpload = await this.cloudinaryService.uploadFile(file);
-    createProductDto.imageUrl = fileUpload?.url;
-    return this.productsService.create(createProductDto);
+  //   const fileUpload = await this.cloudinaryService.uploadFile(file);
+  //   createProductDto.images = fileUpload?.url;
+  //   return this.productsService.create(createProductDto);
+  // }
+
+  @Post()
+  @UseInterceptors(FilesInterceptor('images', 10)) // Giới hạn tối đa 10 ảnh
+  async createProduct(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() images: Array<Express.Multer.File>,
+  ) {
+    const fileUploadPromises = images.map(file => ({
+      fileName: `${Date.now().toString()}-${file.originalname}`,
+      file: file.buffer,
+    }));
+
+    // Upload tất cả ảnh lên S3
+    const imageUrls = await this.productsService.uploadImages(fileUploadPromises);
+
+    // Tạo sản phẩm với các URL ảnh đã upload
+    return this.productsService.create(createProductDto, imageUrls);
   }
 
   @Get()
