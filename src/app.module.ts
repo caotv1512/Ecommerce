@@ -24,6 +24,7 @@ import { ImageModule } from './modules/image/image.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FilesModule } from './modules/upload/upload.module';
 import { ConfigModule } from '@nestjs/config';
+import { BannerModule } from './modules/banner/banner.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     FilesModule,
+    BannerModule,
   ],
   controllers: [],
   providers: [ImageService],

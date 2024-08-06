@@ -13,13 +13,16 @@ export class CategoryService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    imageUrls,
+  ): Promise<Category> {
     const { name } = createCategoryDto;
     const check = await this.checkDuplicateName(name);
     if (check) {
       throw new NotFoundException(`Category with name ${name} already exists`);
     }
-    const category = this.categoryRepository.create({ name });
+    const category = this.categoryRepository.create({ name, image: imageUrls });
     return await this.categoryRepository.save(category);
   }
 

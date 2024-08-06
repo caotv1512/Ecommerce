@@ -50,10 +50,10 @@ export class ProductService {
       }
     // Tạo đối tượng Product từ DTO
     const product = new Product();
-    product.name = createProductDto.name;
-    product.description = createProductDto.description;
-    product.price = createProductDto.price;
-    product.stock = createProductDto.stock;
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    product.stock = stock;
     product.category = category;
 
     // Lưu sản phẩm vào cơ sở dữ liệu
@@ -87,7 +87,7 @@ export class ProductService {
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['category'],
+      relations: ['category', 'images'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
