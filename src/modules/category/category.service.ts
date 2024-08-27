@@ -27,8 +27,19 @@ export class CategoryService {
   }
 
   async findAll(): Promise<Category[]> {
-    const category = await this.categoryRepository.find();
-    return category.map((category) => {
+    // const category = await this.categoryRepository.find({
+    //   relations: ['products'],
+    // });
+    const categories = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect(
+        'category.products',
+        'product',
+        'product.isDelete = :isDelete',
+        { isDelete: false },
+      )
+      .getMany();
+    return categories.map((category) => {
       return {
         ...category,
         value: category.name,

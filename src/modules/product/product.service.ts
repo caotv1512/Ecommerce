@@ -74,6 +74,7 @@ export class ProductService {
 
   async findAll(){
     const products = await this.productRepository.find({
+       where: { isDelete: false } ,
       relations: ['category', 'images'],
     });
     return products.reverse().map((product) => {
@@ -95,44 +96,74 @@ export class ProductService {
     return product;
   }
 
-  async update(
-    id: number,
-    updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    const { name, description, price, stock, images, categoryId } =
-      updateProductDto;
+  // async update(
+  //   id: number,
+  //   updateProductDto: UpdateProductDto,
+  // ): Promise<Product> {
+  //   const { name, description, price, stock, images, categoryId } =
+  //     updateProductDto;
 
+  //   const product = await this.productRepository.findOne({ where: { id } });
+  //   if (!product) {
+  //     throw new NotFoundException(`Product with ID ${id} not found`);
+  //   }
+
+  //   if (name) {
+  //     product.name = name;
+  //   }
+  //   if (description) {
+  //     product.description = description;
+  //   }
+  //   if (price) {
+  //     product.price = price;
+  //   }
+  //   if (stock) {
+  //     product.stock = stock;
+  //   }
+  //   if (images) {
+  //     product.images = [];
+  //   }
+  //   if (categoryId) {
+  //     const category = await this.categoryRepository.findOne({
+  //       where: { id: categoryId },
+  //     });
+  //     if (!category) {
+  //       throw new NotFoundException(`Category with ID ${categoryId} not found`);
+  //     }
+  //     product.category = category;
+  //   }
+
+  //   return this.productRepository.save(product);
+  // }
+
+  async update(id: number, updateProductDto: CreateProductDto, imageUrls: string[]): Promise<Product> {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-
-    if (name) {
-      product.name = name;
-    }
-    if (description) {
-      product.description = description;
-    }
-    if (price) {
-      product.price = price;
-    }
-    if (stock) {
-      product.stock = stock;
-    }
-    if (images) {
-      product.images = [];
-    }
-    if (categoryId) {
-      const category = await this.categoryRepository.findOne({
-        where: { id: categoryId },
+  
+    // Cập nhật các trường sản phẩm
+    Object.assign(product, updateProductDto);
+  console.log('++++++++++++++');
+  
+    // Nếu có URL ảnh mới, tạo đối tượng Image và lưu vào cơ sở dữ liệu
+    if (imageUrls.length > 0) {
+      const images = imageUrls.map(url => {
+        console.log('---------------');
+        
+        const image = new Image();
+        image.url = url;
+        image.product = product;
+        return image;
       });
-      if (!category) {
-        throw new NotFoundException(`Category with ID ${categoryId} not found`);
-      }
-      product.category = category;
+  
+      await this.imageRepository.save(images);
     }
-
-    return this.productRepository.save(product);
+    console.log('=========');
+    
+  
+    // Lưu sản phẩm đã cập nhật vào cơ sở dữ liệu
+    return await this.productRepository.save(product);
   }
 
   async remove(id: number): Promise<void> {
@@ -140,6 +171,7 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    await this.productRepository.remove(product);
+    product.isDelete = true;
+    await this.productRepository.save(product);
   }
 }

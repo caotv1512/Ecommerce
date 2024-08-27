@@ -29,6 +29,9 @@ export class Product {
 
   @OneToMany(() => OrderDetail, orderDetail => orderDetail.product) 
   orderDetails: OrderDetail[]; 
+
+  @Column({ default: false })
+  isDelete: boolean;
   
   @ManyToOne(() => Category, category => category.products)
   category: Category;
