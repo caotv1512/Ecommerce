@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as fs from 'fs';
+import path from 'path';
 
 @Injectable()
 export class EmailService {
@@ -20,17 +21,20 @@ export class EmailService {
   async sendEmail(formData: any) {
     const { from, toList, subject, name, phone } = formData;
 
-    // Đọc template EJS từ file
-    const template = fs.readFileSync('./src/templates/send-mail.ejs', 'utf-8');
-    // Render template với dữ liệu từ formData
-    const html = ejs.render(template, { subject, name, phone });
+ 
+        const header = fs.readFileSync('./src/templates/header.ejs', 'utf-8');
+        const footer = fs.readFileSync('./src/templates/footer.ejs', 'utf-8');
+        
+        const template = fs.readFileSync('./src/templates/send-infor-custommer.ejs', 'utf-8');
+    
+        const html = ejs.render(template, { header, footer, subject, name, phone });
 
     for (const to of toList) {
       const mailOptions = {
         from,
         to,
         subject,
-        html, // Sử dụng HTML thay vì text
+        html,
       };
 
       try {
