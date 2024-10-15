@@ -36,6 +36,11 @@ export class CreateProductDto {
   @ApiProperty()
   @IsNotEmpty()
   categoryId: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNotEmpty()
+  image: string[];
 }
 
 

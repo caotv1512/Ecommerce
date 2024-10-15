@@ -55,22 +55,28 @@ export class ProductController {
     return;
   }
 
+  // @Post()
+  // @UseInterceptors(FilesInterceptor('images', 10)) // Giới hạn tối đa 10 ảnh
+  // async createProduct(
+  //   @Body() createProductDto: CreateProductDto,
+  //   @UploadedFiles() images: Array<Express.Multer.File>,
+  // ) {
+  //   const fileUploadPromises = images.map((file) => ({
+  //     fileName: `${Date.now().toString()}-${file.originalname}`,
+  //     file: file.buffer,
+  //   }));
+
+  //   const imageUrls =
+  //     await this.productsService.uploadImages(fileUploadPromises);
+
+  //   return this.productsService.create(createProductDto, imageUrls);
+  // }
+
   @Post()
-  @UseInterceptors(FilesInterceptor('images', 10)) // Giới hạn tối đa 10 ảnh
-  async createProduct(
-    @Body() createProductDto: CreateProductDto,
-    @UploadedFiles() images: Array<Express.Multer.File>,
-  ) {
-    const fileUploadPromises = images.map((file) => ({
-      fileName: `${Date.now().toString()}-${file.originalname}`,
-      file: file.buffer,
-    }));
+  async createProduct(@Body() createProductDto: CreateProductDto) {
 
-    // Upload tất cả ảnh lên S3
-    const imageUrls =
-      await this.productsService.uploadImages(fileUploadPromises);
+    const imageUrls = createProductDto.image;
 
-    // Tạo sản phẩm với các URL ảnh đã upload
     return this.productsService.create(createProductDto, imageUrls);
   }
 
@@ -100,38 +106,40 @@ export class ProductController {
   //   }
   // }
 
+  // @Put(':id')
+  // @UseInterceptors(FilesInterceptor('images', 10)) // Giới hạn tối đa 10 ảnh
+  // async updateProduct(
+  //   @Param('id') id: number,
+  //   @Body() updateProductDto: CreateProductDto,
+  //   @UploadedFiles() images: Array<Express.Multer.File>,
+  // ) {
+  //   const product = await this.productsService.findOne(id);
+  //   if (!product) {
+  //     throw new NotFoundException(`Product with ID ${id} not found`);
+  //   }
+
+  //   let imageUrls: string[] = [];
+  //   if (images && images.length > 0) {
+  //     const fileUploadPromises = images.map((file) => ({
+  //       fileName: `${Date.now().toString()}-${file.originalname}`,
+  //       file: file.buffer,
+  //     }));
+  //     imageUrls = await this.productsService.uploadImages(fileUploadPromises);
+  //   }
+  //   const updatedProduct = await this.productsService.update(
+  //     id,
+  //     updateProductDto,
+  //     imageUrls,
+  //   );
+  //   return updatedProduct;
+  // }
+
   @Put(':id')
-  @UseInterceptors(FilesInterceptor('images', 10)) // Giới hạn tối đa 10 ảnh
   async updateProduct(
     @Param('id') id: number,
     @Body() updateProductDto: CreateProductDto,
-    @UploadedFiles() images: Array<Express.Multer.File>,
   ) {
-    // Tìm sản phẩm cần cập nhật
-    console.log(updateProductDto,'CDMMMM');
-    
-    console.log(images, 'images');
-    
-    const product = await this.productsService.findOne(id);
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
-    // console.log(product,'product');
-    
-
-    // Nếu có ảnh mới, upload và lấy URL
-    let imageUrls: string[] = [];
-    if (images && images.length > 0) {
-      const fileUploadPromises = images.map((file) => ({
-        fileName: `${Date.now().toString()}-${file.originalname}`,
-        file: file.buffer,
-      }));
-
-      // Upload tất cả ảnh lên S3
-      imageUrls = await this.productsService.uploadImages(fileUploadPromises);
-    }
-
-    // Cập nhật thông tin sản phẩm
+    let imageUrls: string[] = updateProductDto.image
     const updatedProduct = await this.productsService.update(
       id,
       updateProductDto,

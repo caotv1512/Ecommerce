@@ -142,14 +142,10 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
   
-    // Cập nhật các trường sản phẩm
     Object.assign(product, updateProductDto);
-  console.log('++++++++++++++');
   
-    // Nếu có URL ảnh mới, tạo đối tượng Image và lưu vào cơ sở dữ liệu
     if (imageUrls.length > 0) {
       const images = imageUrls.map(url => {
-        console.log('---------------');
         
         const image = new Image();
         image.url = url;
@@ -159,10 +155,7 @@ export class ProductService {
   
       await this.imageRepository.save(images);
     }
-    console.log('=========');
     
-  
-    // Lưu sản phẩm đã cập nhật vào cơ sở dữ liệu
     return await this.productRepository.save(product);
   }
 
